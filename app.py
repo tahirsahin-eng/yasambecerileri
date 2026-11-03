@@ -19,14 +19,6 @@ st.markdown("""
         padding: 15px;
         border-left: 5px solid #d9534f;
     }
-    .category-header {
-        background-color: #f1f3f5;
-        padding: 8px 12px;
-        border-radius: 5px;
-        font-weight: bold;
-        color: #1e3a8a;
-        margin-top: 10px;
-    }
     div.stButton > button:first-child {
         background-color: #0d6efd;
         color: white;
@@ -50,76 +42,15 @@ if "df_processed" not in st.session_state:
 if "meta" not in st.session_state:
     st.session_state.meta = {}
 
-# Başlık
 st.title("🧭 Saffet Çam OO - Yaşam Pencerem Risk Analiz Sistemi")
 st.caption("Rehberlik Servisi ve Okul Yönetimi Tematik Risk ve Öğrenci Takip Modülü")
 
-# 4 Ana Başlık ve Kapsadığı Maddeler
-KATEGORILER = {
-    "1. Kritik Risk, Güvenlik ve İstismar": [
-        "7. Arkadaşlarımdan bazıları bağımlılık yapıcı madde kullanıyor.",
-        "13. Fiziksel güce ihtiyacım olduğunda beni destekleyecek bir grubun üyesiyim.",
-        "15. Çevremdeki insanlar tarafından istemediğim söz ve hareketlere maruz kalıyorum.",
-        "16. Hoşlanmadığım davranışlara zorlanıyorum.",
-        "18. Hayatı yaşamaya değer bulmuyorum.",
-        "25. Yaşamım üzerinde hiç kontrolüm yok.",
-        "36. Okulda kendimi güvende hissetmiyorum."
-    ],
-    "2. Aile İçi Dinamikler ve Sosyo-Ekonomik Durum": [
-        "2. Ailem benim bir üst öğrenime devam etmemi istemiyor.",
-        "10. Ailemin benden beklentisi çok yüksek.",
-        "11. Aile ortamımızda sık sık tartışma olur.",
-        "14. Temel ihtiyaçlarımızı karşılayacak maddi olanaklardan yoksunum.",
-        "17. Ailemin geçimini sağlamak için bir işte çalışıyorum.",
-        "19. Ailemi bana ve ihtiyaçlarıma (maddi, manevi) karşı ilgisiz buluyorum.",
-        "21. Ailemiz içerisinde belli kurallar yoktur.",
-        "22. Ailemde zararlı alışkanlıkları olan birey/bireyler var.",
-        "24. Ailemden ayrı yaşıyorum.",
-        "29. Annem/babam okuma yazma bilmiyor.",
-        "38. Ailem teknoloji ile (cep telefonu, tablet, internet vs.) çok vakit geçiriyor.",
-        "47. Ailemden biri/birileri şehit/gazi oldu."
-    ],
-    "3. Bireysel, Psikolojik ve Duygusal Boyut": [
-        "1. Sürekli devam eden bir hastalığım var.",
-        "3. Deprem/yangın/sel/savaş/trafik kazası vb. durumlardan en az birini yaşadım.",
-        "4. Değerlerimi/inançlarımı yaşayabileceğim ortam sağlanmıyor.",
-        "5. Daha önce yaşamadığım bazı korkularım var.",
-        "6. Öfkemi kontrol edemiyorum.",
-        "8. Teknoloji ile (cep telefonu, tablet, internet vs.) çok vakit geçiriyorum.",
-        "9. Çoğu zaman kimseyle konuşmak görüşmek istemiyorum.",
-        "12. Arkadaşlık kurmakta zorlanıyorum.",
-        "20. Fiziksel görünüşümden rahatsızım.",
-        "23. Kendime hiç güvenim yok.",
-        "26. Kendimi belirli bir alanda çok yetenekli buluyorum.",
-        "30. Başkaları ile kıyaslanıyorum.",
-        "34. Fazla heyecanlanıyorum.",
-        "37. Kendimi herhangi bir alanda yetenekli bulmuyorum.",
-        "39. Farklı tercihlerimden dolayı çevrem tarafından dışlanıyorum.",
-        "42. Sevdiğim bir yakınımı kaybettiğim için çok üzgünüm."
-    ],
-    "4. Okul İklimi, Dersler ve Eğitsel Alan": [
-        "27. Okul dışında kaliteli vakit geçireceğim aktiviteler yapacak fırsatım yok.",
-        "28. İstesem de derslerimde başarılı olamıyorum.",
-        "31. Dersler ilgi çekici hale getirilmiyor.",
-        "32. Okulu bitirdikten sonra ne yapmak istediğimi bilmiyorum.",
-        "33. Okulu sevmiyorum.",
-        "35. Okulda problemlerimizle fazla ilgilenilmiyor.",
-        "40. Okuldaki disiplin anlayışından rahatsızım.",
-        "41. Okulda yeteri kadar sosyal etkinlik düzenlenmiyor.",
-        "43. Okulda alınan kararlarda öğrencilerin görüşü alınmıyor.",
-        "44. Öğrenci sorunları öğrencilerle çözülmek yerine önce ailelere aktarılıyor.",
-        "45. Öğrenciler arasında ayrım yapılıyor.",
-        "46. Okula uyum sağlayamadım.",
-        "48. Okul yeterince temiz değil."
-    ]
-}
-
-# Açıklama sütunları eşleştirmesi
-ACIKLAMA_MAP = {
-    "1. Sürekli devam eden bir hastalığım var.": "1. Madde için devam eden hastalığınız varsa lütfen yazınız:",
-    "3. Deprem/yangın/sel/savaş/trafik kazası vb. durumlardan en az birini yaşadım.": "3. Madde için yaşadıysanız hangisi olduğunu belirtiniz:",
-    "24. Ailemden ayrı yaşıyorum.": "24. Madde için aileden ayrı yaşıyorsanız nedenini belirtiniz:",
-    "42. Sevdiğim bir yakınımı kaybettiğim için çok üzgünüm.": "42. Madde için kaybettiğiniz yakınınızı lütfen belirtiniz:"
+# 4 Ana Başlık - Numaralara Göre Eşleştirme (Böylece sütun adındaki küçük harf/noktalama farkları hata vermez)
+KATEGORI_NUMARALARI = {
+    "1. Kritik Risk, Güvenlik ve İstismar": [7, 13, 15, 16, 18, 25, 36],
+    "2. Aile İçi Dinamikler ve Sosyo-Ekonomik Durum": [2, 10, 11, 14, 17, 19, 21, 22, 24, 29, 38, 47],
+    "3. Bireysel, Psikolojik ve Duygusal Boyut": [1, 3, 4, 5, 6, 8, 9, 12, 20, 23, 26, 30, 34, 37, 39, 42],
+    "4. Okul İklimi, Dersler ve Eğitsel Alan": [27, 28, 31, 32, 33, 35, 40, 41, 43, 44, 45, 46, 48]
 }
 
 # Kenar Çubuğu
@@ -132,21 +63,32 @@ if uploaded_file is not None:
         st.session_state.analiz_yapildi = False
 
 def process_dataset(file):
-    if file.name.endswith('.csv'):
-        df = pd.read_csv(file)
-    else:
-        df = pd.read_excel(file)
+    try:
+        if file.name.endswith('.csv'):
+            df = pd.read_csv(file)
+        else:
+            df = pd.read_excel(file)
+    except Exception:
+        file.seek(0)
+        df = pd.read_excel(file, engine='openpyxl')
 
-    class_cols = [c for c in df.columns if any(k in c.lower() for k in ['sınıf', 'sube', 'şube'])]
-    class_col = class_cols[0] if class_cols else "Sınıfınız ve Şubeniz"
+    # Sınıf sütununu dinamik bul
+    class_cols = [c for c in df.columns if any(k in str(c).lower() for k in ['sınıf', 'sube', 'şube'])]
+    class_col = class_cols[0] if class_cols else df.columns[1]
 
-    # Öğrenci ad/no birleştirme
-    name_cols = [c for c in df.columns if 'adınız' in c.lower() or 'soyadınız' in c.lower()]
+    # Öğrenci adı sütunlarını bulup birleştir
+    name_cols = [c for c in df.columns if any(k in str(c).lower() for k in ['adınız', 'soyadınız', 'öğrenci', 'ad soyad'])]
+    
     def extract_student_info(row):
-        for col in name_cols:
-            val = row[col]
-            if pd.notna(val) and str(val).strip() != '':
-                return str(val).strip()
+        if name_cols:
+            for col in name_cols:
+                val = row[col]
+                if pd.notna(val) and str(val).strip() != '':
+                    return str(val).strip()
+        # Eğer ad soyad sütunu bulunamazsa 2. veya 3. sütunu dene
+        for c in df.columns[1:5]:
+            if pd.notna(row[c]) and str(row[c]).strip() != '':
+                return str(row[c]).strip()
         return "Bilinmiyor"
 
     df['Ogrenci_Ham'] = df.apply(extract_student_info, axis=1)
@@ -160,131 +102,148 @@ def process_dataset(file):
     df['Okul_No'] = df['Ogrenci_Ham'].apply(lambda x: split_no_name(x)[0])
     df['Ad_Soyad'] = df['Ogrenci_Ham'].apply(lambda x: split_no_name(x)[1])
 
-    main_questions = [c for c in df.columns if re.match(r'^\d+\.', c) and 'lütfen' not in c.lower() and 'belirtiniz' not in c.lower()]
-    risk_questions = [q for q in main_questions if not q.startswith('26.')]
+    # Ana soruları dinamik olarak tespit et (Başında sayı olanlar ve açık uçlu soru olmayanlar)
+    main_questions = [
+        c for c in df.columns 
+        if re.match(r'^\d+\.', str(c).strip()) and not any(k in str(c).lower() for k in ['lütfen', 'belirtiniz', 'yazınız'])
+    ]
 
-    df['Genel_Risk_Puani'] = df[risk_questions].apply(lambda row: (row == 'Bana Uygun').sum(), axis=1)
-    df['Kritik_Risk_Puani'] = df[KATEGORILER["1. Kritik Risk, Güvenlik ve İstismar"]].apply(lambda row: (row == 'Bana Uygun').sum(), axis=1)
+    # Soru numarasına göre sütun haritası
+    q_num_to_col = {}
+    for col in main_questions:
+        m = re.match(r'^(\d+)\.', str(col).strip())
+        if m:
+            q_num_to_col[int(m.group(1))] = col
 
-    return df, class_col, main_questions, risk_questions
+    # Kategorileri mevcut sütunlarla eşleştir
+    kategoriler_map = {}
+    for cat_name, num_list in KATEGORI_NUMARALARI.items():
+        matched_cols = [q_num_to_col[n] for n in num_list if n in q_num_to_col]
+        kategoriler_map[cat_name] = matched_cols
+
+    # Risk maddeleri (26. yetenek maddesi hariç)
+    risk_questions = [col for col in main_questions if not str(col).strip().startswith('26.')]
+
+    # Risk puanlarını güvenli hesapla
+    df['Genel_Risk_Puani'] = df[risk_questions].apply(lambda row: (row == 'Bana Uygun').sum(), axis=1) if risk_questions else 0
+
+    kritik_cols = kategoriler_map.get("1. Kritik Risk, Güvenlik ve İstismar", [])
+    if kritik_cols:
+        df['Kritik_Risk_Puani'] = df[kritik_cols].apply(lambda row: (row == 'Bana Uygun').sum(), axis=1)
+    else:
+        df['Kritik_Risk_Puani'] = 0
+
+    return df, class_col, main_questions, risk_questions, kategoriler_map
 
 # RUN BUTONU
 if uploaded_file is not None:
     run_button = st.sidebar.button("🚀 Analizi Başlat / Çalıştır (Run)")
     if run_button:
-        with st.spinner("Veriler işleniyor..."):
-            df_proc, class_col, main_questions, risk_questions = process_dataset(uploaded_file)
-            st.session_state.df_processed = df_proc
-            st.session_state.meta = {
-                "class_col": class_col,
-                "main_questions": main_questions,
-                "risk_questions": risk_questions
-            }
-            st.session_state.analiz_yapildi = True
-        st.sidebar.success("Analiz tamamlandı!")
+        with st.spinner("Dosya taranıyor, risk skorları hesaplanıyor..."):
+            try:
+                df_proc, class_col, main_questions, risk_questions, kategoriler_map = process_dataset(uploaded_file)
+                st.session_state.df_processed = df_proc
+                st.session_state.meta = {
+                    "class_col": class_col,
+                    "main_questions": main_questions,
+                    "risk_questions": risk_questions,
+                    "kategoriler_map": kategoriler_map
+                }
+                st.session_state.analiz_yapildi = True
+                st.sidebar.success("Analiz tamamlandı!")
+            except Exception as e:
+                st.error(f"Dosya işlenirken hata oluştu: {e}")
 
-# Analiz Sonuç Paneli
+# Analiz Sonuçları
 if st.session_state.analiz_yapildi and st.session_state.df_processed is not None:
     df = st.session_state.df_processed
     class_col = st.session_state.meta["class_col"]
     main_questions = st.session_state.meta["main_questions"]
     risk_questions = st.session_state.meta["risk_questions"]
+    kategoriler_map = st.session_state.meta["kategoriler_map"]
 
     st.sidebar.markdown("---")
     st.sidebar.subheader("🔍 Kapsam Seçimi")
-    all_classes = ["Tüm Okul"] + sorted(df[class_col].dropna().unique().tolist())
+    all_classes = ["Tüm Okul"] + sorted([str(x) for x in df[class_col].dropna().unique()])
     selected_class = st.sidebar.selectbox("Sınıf / Şube:", all_classes)
 
     filtered_df = df if selected_class == "Tüm Okul" else df[df[class_col] == selected_class]
 
-    # Üst Özet Kartları
+    # Metrikler
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Öğrenci Sayısı", len(filtered_df))
-    c2.metric("Ortalama Risk Skoru", f"{filtered_df['Genel_Risk_Puani'].mean():.1f}")
-    c3.metric("Maksimum Risk", f"{filtered_df['Genel_Risk_Puani'].max():.0f}")
+    c2.metric("Ortalama Risk", f"{filtered_df['Genel_Risk_Puani'].mean():.1f}")
+    c3.metric("En Yüksek Risk", f"{filtered_df['Genel_Risk_Puani'].max():.0f}")
     c4.metric("Kritik Riskli Öğrenci", len(filtered_df[filtered_df['Kritik_Risk_Puani'] > 0]))
 
     st.markdown("---")
 
-    # Sekmeler
     tab_cat, tab_risk, tab_custom, tab_student = st.tabs([
         "📊 Tematik Başlık Analiz Raporu",
         "🚨 En Yüksek Riskli Öğrenciler",
         "📌 Özel Çoklu Madde Filtresi",
-        "👤 Bireysel Öğrenci Profili"
+        "👤 Bireysel Öğrenci Kartı"
     ])
 
-    # SEKME 1: TEMATİK BAŞLIK BAZLI ANALİZ VE SEÇENLERİ GÖSTERME
+    # SEKME 1: TEMATİK BAŞLIKLAR
     with tab_cat:
-        st.subheader(f"Başlıklara Göre Madde Dağılımı ve Seçen Öğrenciler ({selected_class})")
-        st.write("İncelemek istediğiniz tematik başlığı seçiniz. Ardından herhangi bir maddenin yanındaki **'Öğrencileri Göster'** kutusunu açarak o maddeyi işaretleyen öğrencilerin tam listesine ve açıklamalarına ulaşabilirsiniz.")
+        st.subheader(f"Tematik Başlıklara Göre Maddeler ve Seçenler ({selected_class})")
+        selected_cat = st.selectbox("📂 Tematik Başlık Seçiniz:", list(kategoriler_map.keys()))
+        cat_items = kategoriler_map[selected_cat]
 
-        selected_cat = st.selectbox("📂 Tematik Başlık Seçiniz:", list(KATEGORILER.keys()))
-        cat_items = KATEGORILER[selected_cat]
+        if not cat_items:
+            st.warning("Bu başlık altında eşleşen madde bulunamadı.")
+        else:
+            summary_rows = []
+            for item in cat_items:
+                count = (filtered_df[item] == "Bana Uygun").sum()
+                ratio = (count / len(filtered_df) * 100) if len(filtered_df) > 0 else 0
+                summary_rows.append({
+                    "Madde": item,
+                    "İşaretleyen Sayısı": count,
+                    "Oran (%)": f"%{ratio:.1f}"
+                })
+            st.dataframe(pd.DataFrame(summary_rows), use_container_width=True, hide_index=True)
 
-        # Başlığa ait maddelerin özet tablosunu oluştur
-        summary_rows = []
-        for item in cat_items:
-            count = (filtered_df[item] == "Bana Uygun").sum()
-            ratio = (count / len(filtered_df) * 100) if len(filtered_df) > 0 else 0
-            summary_rows.append({
-                "Madde": item,
-                "İşaretleyen Öğrenci": count,
-                "Oran (%)": f"%{ratio:.1f}"
-            })
+            st.markdown("---")
+            st.subheader("👥 Maddeyi Seçen Öğrencilerin Detay Listesi")
 
-        summary_table = pd.DataFrame(summary_rows)
-        st.dataframe(summary_table, use_container_width=True, hide_index=True)
+            for item in cat_items:
+                chosen = filtered_df[filtered_df[item] == "Bana Uygun"].copy()
+                st_count = len(chosen)
+                
+                exp_title = f"{'🔴' if 'Kritik' in selected_cat else '🔹'} {item} — ({st_count} Öğrenci)"
+                with st.expander(exp_title, expanded=(st_count > 0 and 'Kritik' in selected_cat)):
+                    if st_count == 0:
+                        st.caption("Bu maddeyi işaretleyen öğrenci bulunmamaktadır.")
+                    else:
+                        disp = chosen[[class_col, 'Okul_No', 'Ad_Soyad', 'Genel_Risk_Puani']].rename(columns={
+                            class_col: 'Sınıf/Şube',
+                            'Okul_No': 'No',
+                            'Ad_Soyad': 'Öğrenci Adı Soyadı',
+                            'Genel_Risk_Puani': 'Genel Risk Skoru'
+                        })
+                        st.dataframe(disp, use_container_width=True, hide_index=True)
 
-        st.markdown("---")
-        st.subheader("👥 Maddeyi Seçen Öğrencilerin Detay Listesi")
-
-        # Maddeleri expander içinde açıp öğrencileri listeleme
-        for item in cat_items:
-            chosen_students = filtered_df[filtered_df[item] == "Bana Uygun"].copy()
-            st_count = len(chosen_students)
-            
-            exp_title = f"{'🔴' if 'Kritik' in selected_cat else '🔹'} {item} — ({st_count} Öğrenci)"
-            with st.expander(exp_title, expanded=(st_count > 0 and 'Kritik' in selected_cat)):
-                if st_count == 0:
-                    st.caption("Bu maddeyi işaretleyen öğrenci bulunmamaktadır.")
-                else:
-                    show_cols = [class_col, 'Okul_No', 'Ad_Soyad', 'Genel_Risk_Puani']
-                    
-                    # Eğer maddenin özel açık uçlu açıklaması varsa tabloya ekle
-                    expl_col = ACIKLAMA_MAP.get(item)
-                    if expl_col and expl_col in filtered_df.columns:
-                        show_cols.append(expl_col)
-
-                    display_subset = chosen_students[show_cols].rename(columns={
-                        class_col: 'Sınıf/Şube',
-                        'Okul_No': 'No',
-                        'Ad_Soyad': 'Öğrenci Adı Soyadı',
-                        'Genel_Risk_Puani': 'Genel Risk Skoru'
-                    })
-                    if expl_col and expl_col in filtered_df.columns:
-                        display_subset = display_subset.rename(columns={expl_col: 'Öğrencinin Açıklaması / Detay'})
-
-                    st.dataframe(display_subset, use_container_width=True, hide_index=True)
-
-                    # Bu maddeye özel Excel indirme butonu
-                    b_io = io.BytesIO()
-                    with pd.ExcelWriter(b_io, engine='xlsxwriter') as wr:
-                        display_subset.to_excel(wr, sheet_name='Ogrenci_Listesi', index=False)
-                    st.download_button(
-                        label=f"📥 Bu Maddenin Öğrenci Listesini İndir (Excel)",
-                        data=b_io.getvalue(),
-                        file_name=f"Madde_Raporu_{item[:15].strip()}_{selected_class}.xlsx",
-                        mime="application/vnd.ms-excel",
-                        key=f"dl_{item}"
-                    )
+                        # Excel İndir
+                        b_io = io.BytesIO()
+                        with pd.ExcelWriter(b_io, engine='openpyxl') as wr:
+                            disp.to_excel(wr, sheet_name='Ogrenci_Listesi', index=False)
+                        st.download_button(
+                            label="📥 Bu Maddenin Öğrenci Listesini İndir (Excel)",
+                            data=b_io.getvalue(),
+                            file_name=f"Madde_{item[:12].strip()}_{selected_class}.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            key=f"dl_{item}"
+                        )
 
     # SEKME 2: EN YÜKSEK RİSKLİ ÖĞRENCİLER
     with tab_risk:
         st.subheader(f"En Yüksek Risk Sıralaması ({selected_class})")
         col_c1, col_c2 = st.columns([2, 1])
         with col_c1:
-            min_risk = st.slider("Minimum Risk Eşiği:", min_value=0, max_value=int(df['Genel_Risk_Puani'].max()), value=15)
+            max_p = int(df['Genel_Risk_Puani'].max()) if len(df) > 0 else 30
+            min_risk = st.slider("Minimum Risk Eşiği:", min_value=0, max_value=max_p, value=min(15, max_p))
         with col_c2:
             only_critical = st.checkbox("Yalnızca Kritik Maddesi Olanlar", value=False)
 
@@ -308,7 +267,7 @@ if st.session_state.analiz_yapildi and st.session_state.df_processed is not None
             hide_index=True
         )
 
-    # SEKME 3: ÖZEL ÇOKLU MADDE FİLTRESİ
+    # SEKME 3: ÇOKLU MADDE FİLTRESİ
     with tab_custom:
         st.subheader("Özel Çoklu Madde Filtresi")
         selected_custom_items = st.multiselect("Birlikte sorgulanacak maddeleri seçin:", options=main_questions)
@@ -333,26 +292,14 @@ if st.session_state.analiz_yapildi and st.session_state.df_processed is not None
             sc1.warning(f"**Genel Risk Skoru:** {s_data['Genel_Risk_Puani']} / {len(risk_questions)}")
             sc2.error(f"**Kritik Madde Sayısı:** {s_data['Kritik_Risk_Puani']}")
 
-            # Başlık bazında işaretlediği maddeler
             st.markdown("##### 📋 Başlıklara Göre İşaretlediği Maddeler:")
-            for cat_name, cat_items_list in KATEGORILER.items():
+            for cat_name, cat_items_list in kategoriler_map.items():
                 marked_in_cat = [q for q in cat_items_list if s_data[q] == "Bana Uygun"]
                 if marked_in_cat:
                     st.markdown(f"**{cat_name} ({len(marked_in_cat)} Madde):**")
                     for q in marked_in_cat:
                         crit_flag = "🔴 " if "Kritik" in cat_name else "🔹 "
                         st.write(f"{crit_flag}{q}")
-
-            # Açık uçlu metinler
-            st.markdown("##### 📝 Öğrencinin Yazılı Notları:")
-            note_cols = [c for c in df.columns if any(k in c.lower() for k in ['yazınız', 'belirtiniz', 'eklemek'])]
-            found_any = False
-            for nc in note_cols:
-                if pd.notna(s_data[nc]) and str(s_data[nc]).strip() != "":
-                    found_any = True
-                    st.info(f"**{nc}:** {s_data[nc]}")
-            if not found_any:
-                st.caption("Öğrencinin ek bir açıklaması bulunmamaktadır.")
 
 elif uploaded_file is not None and not st.session_state.analiz_yapildi:
     st.info("👈 Dosya hazır. Analizi çalıştırmak için sol paneldeki **'🚀 Analizi Başlat / Çalıştır (Run)'** butonuna tıklayınız.")
