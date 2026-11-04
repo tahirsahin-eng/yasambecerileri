@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Mobil & Masaüstü Uyumlu Stil
+# Mobil & Masaüstü Stil
 st.markdown("""
 <style>
     @media (max-width: 768px) {
@@ -28,6 +28,10 @@ st.markdown("""
         width: 100%;
         padding: 12px;
     }
+    div.stButton > button:first-child:hover {
+        background-color: #0b5ed7;
+        color: white;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -42,7 +46,7 @@ if "meta" not in st.session_state:
 st.title("🧭 Yaşam Pencerem Risk Analiz Sistemi")
 st.caption("Rehberlik Servisi ve Okul Yönetimi Çoklu Veri Kaynağı Modülü")
 
-# Kategori Eşleştirmeleri
+# Kategori Numaraları
 KATEGORI_NUMARALARI = {
     "1. Kritik Risk, Güvenlik ve İstismar": [7, 13, 15, 16, 18, 25, 36],
     "2. Aile İçi Dinamikler ve Sosyo-Ekonomik": [2, 10, 11, 14, 17, 19, 21, 22, 24, 29, 38, 47],
@@ -50,7 +54,7 @@ KATEGORI_NUMARALARI = {
     "4. Okul İklimi ve Dersler": [27, 28, 31, 32, 33, 35, 40, 41, 43, 44, 45, 46, 48]
 }
 
-# Veri Kaynağı Seçimi
+# Veri Kaynağı
 st.sidebar.header("📁 Veri Kaynağı")
 kaynak_turu = st.sidebar.radio(
     "Veri Alma Yöntemi:",
@@ -58,15 +62,13 @@ kaynak_turu = st.sidebar.radio(
     index=0
 )
 
-raw_df = None
+sheet_url = ""
+uploaded_file = None
 
 def convert_google_sheet_url_to_csv(url):
-    """Google Sheets veya Drive linkini doğrudan CSV indirme bağlantısına çevirir."""
-    # /d/ID/ formatını bul
     sheet_id_match = re.search(r'/d/([a-zA-Z0-9-_]+)', url)
     if sheet_id_match:
         sheet_id = sheet_id_match.group(1)
-        # GID (sayfa id) varsa al
         gid_match = re.search(r'[#&]gid=([0-9]+)', url)
         gid = gid_match.group(1) if gid_match else "0"
         return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
@@ -74,31 +76,17 @@ def convert_google_sheet_url_to_csv(url):
 
 if kaynak_turu == "Google Drive / E-Tablo Linki":
     sheet_url = st.sidebar.text_input(
-        "Google Sheets / Drive Bağlantısı:",
-        placeholder="https://docs.google.com/spreadsheets/d/..."
+        "Google Sheets Bağlantısını Yapıştırın:",
+        placeholder="https://docs.google.com/spreadsheets/d/...",
+        help="Link yapıştırdıktan sonra klavyeden Enter tuşuna basınız."
     )
     if not sheet_url and not st.session_state.analiz_yapildi:
-        st.info("💡 **Google Drive'dan Okuma:** Form yanıtlarının toplandığı Google E-Tablo'nun bağlantısını sol menüye yapıştırabilirsiniz. (Tablonun 'Bağlantıya sahip olan herkes görüntüleyebilir' olarak ayarlandığından emin olun).")
-    
-    if sheet_url:
-        try:
-            csv_export_url = convert_google_sheet_url_to_csv(sheet_url)
-            raw_df = pd.read_csv(csv_export_url)
-            st.sidebar.success("Google E-Tablo başarıyla okundu!")
-        except Exception as e:
-            st.sidebar.error(f"Google E-Tablo okunamadı: Lütfen paylaşım ayarlarını kontrol edin. ({e})")
-
+        st.info("💡 **Google Drive'dan Okuma:** Google E-Tablo linkini sol menüye yapıştırıp alttaki **'🚀 Analizi Başlat / Çalıştır (Run)'** butonuna tıklayınız. (Tablonun 'Bağlantıya sahip herkes görüntüleyebilir' ayarında olduğundan emin olunuz).")
 else:
     uploaded_file = st.sidebar.file_uploader("CSV veya Excel Dosyası Seçin:", type=["csv", "xlsx"])
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.endswith('.csv'):
-                raw_df = pd.read_csv(uploaded_file)
-            else:
-                raw_df = pd.read_excel(uploaded_file)
-        except Exception:
-            uploaded_file.seek(0)
-            raw_df = pd.read_csv(uploaded_file, sep=';')
+
+# RUN BUTONU HER ZAMAN GÖRÜNÜR OLMALI
+run_clicked = st.sidebar.button("🚀 Analizi Başlat / Çalıştır (Run)")
 
 def process_dataset(df):
     class_cols = [c for c in df.columns if any(k in str(c).lower() for k in ['sınıf', 'sube', 'şube'])]
@@ -169,10 +157,35 @@ def process_dataset(df):
 
     return df, class_col, main_questions, risk_questions, kategoriler_map
 
-# RUN BUTONU
-if raw_df is not None:
-    if st.sidebar.button("🚀 Analizi Başlat / Çalıştır (Run)"):
-        with st.spinner("Veriler işleniyor..."):
+# Butona basıldığında veriyi oku ve işle
+if run_clicked:
+    raw_df = None
+    if kaynak_turu == "Google Drive / E-Tablo Linki":
+        if not sheet_url.strip():
+            st.sidebar.error("Lütfen önce bir Google Sheets bağlantısı yapıştırın!")
+        else:
+            with st.spinner("Google E-Tablo indiriliyor..."):
+                try:
+                    csv_export_url = convert_google_sheet_url_to_csv(sheet_url)
+                    raw_df = pd.read_csv(csv_export_url)
+                    st.sidebar.success("E-Tablo başarıyla indirildi!")
+                except Exception as e:
+                    st.sidebar.error(f"Tablo okunamadı! Paylaşım ayarının 'Bağlantıya sahip herkes' olduğundan emin olun. Hata: {e}")
+    else:
+        if uploaded_file is None:
+            st.sidebar.error("Lütfen önce bir dosya yükleyin!")
+        else:
+            try:
+                if uploaded_file.name.endswith('.csv'):
+                    raw_df = pd.read_csv(uploaded_file)
+                else:
+                    raw_df = pd.read_excel(uploaded_file)
+            except Exception:
+                uploaded_file.seek(0)
+                raw_df = pd.read_csv(uploaded_file, sep=';')
+
+    if raw_df is not None:
+        with st.spinner("Veriler işleniyor, risk analizi yapılıyor..."):
             df_proc, class_col, main_questions, risk_questions, kategoriler_map = process_dataset(raw_df)
             st.session_state.df_processed = df_proc
             st.session_state.meta = {
@@ -182,6 +195,7 @@ if raw_df is not None:
                 "kategoriler_map": kategoriler_map
             }
             st.session_state.analiz_yapildi = True
+            st.rerun()
 
 # Analiz Sonuçları
 if st.session_state.analiz_yapildi and st.session_state.df_processed is not None:
